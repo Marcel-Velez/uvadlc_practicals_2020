@@ -33,14 +33,19 @@ class MLP(object):
         TODO:
         Implement initialization of the network.
         """
+        super(MLP, self).__init__()
+        self.layers = []
+        
+        # check whether the network has hidden layers or not
+        if len(n_hidden) >= 1:
+          for n_outputs in n_hidden:
+            self.layers.append(LinearModule(n_inputs,n_outputs))
+            self.layers.append(ELUModule())
+            n_inputs = n_outputs
 
-        ########################
-        # PUT YOUR CODE HERE  #
-        #######################
-        raise NotImplementedError
-        ########################
-        # END OF YOUR CODE    #
-        #######################
+        self.layers.append(LinearModule(n_inputs,n_classes))
+        self.layers.append(SoftMaxModule())
+        
 
     def forward(self, x):
         """
@@ -56,14 +61,9 @@ class MLP(object):
         Implement forward pass of the network.
         """
 
-        ########################
-        # PUT YOUR CODE HERE  #
-        #######################
-        raise NotImplementedError
-        ########################
-        # END OF YOUR CODE    #
-        #######################
-
+        for layer in self.layers:
+          x = layer.forward(x)
+        out = x
         return out
 
     def backward(self, dout):
@@ -76,13 +76,17 @@ class MLP(object):
         TODO:
         Implement backward pass of the network.
         """
-
-        ########################
-        # PUT YOUR CODE HERE  #
-        #######################
-        raise NotImplementedError
-        ########################
-        # END OF YOUR CODE    #
-        #######################
+        # compute the gradient by backtracking through the network
+        for layer in reversed(self.layers):
+          dout = layer.backward(dout)
 
         return
+
+
+    def updatableLayers(self):
+      """
+      Returns the layers of the network that have updateable parameters
+      """
+      for layer in self.layers:
+        if isinstance(layer, LinearModule):
+          yield layer

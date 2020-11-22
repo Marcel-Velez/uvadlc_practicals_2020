@@ -34,16 +34,10 @@ class CustomLayerNormAutograd(nn.Module):
           Initialize parameters gamma and beta via nn.Parameter
         """
         super(CustomLayerNormAutograd, self).__init__()
-        
-        ########################
-        # PUT YOUR CODE HERE  #
-        #######################
-        
-        raise NotImplementedError
-        
-        ########################
-        # END OF YOUR CODE    #
-        #######################
+        self.n_neurons = n_neurons
+        self.eps = eps
+        self.gamma = nn.Parameter(torch.ones((n_neurons)))
+        self.beta = nn.Parameter(torch.zeros((n_neurons)))
     
     def forward(self, input):
         """
@@ -59,16 +53,16 @@ class CustomLayerNormAutograd(nn.Module):
           Implement layer normalization forward pass as given in the assignment.
           For the case that you make use of torch.var be aware that the flag unbiased=False should be set.
         """
-        
-        ########################
-        # PUT YOUR CODE HERE  #
-        #######################
 
-        raise NotImplementedError
+        assert input.shape[1] == self.n_neurons, "not correct dimeonsion 1, give {} expected {}".format(input.shape[1], self.n_neurons)
 
-        ########################
-        # END OF YOUR CODE    #
-        #######################
+        # compute mu and variance with keepdim True to allow for easy matrix operations without weird indexing or reshaping
+        # for formulas see assingment
+        mu = input.mean(1,keepdim=True)
+        variance = input.var(1,unbiased=False,keepdim=True)
+
+        normalize = (input - mu).div( (variance + self.eps).sqrt())
+        out = self.gamma * normalize + self.beta
         
         return out
 
@@ -118,9 +112,7 @@ class CustomLayerNormManualFunction(torch.autograd.Function):
         ########################
         # PUT YOUR CODE HERE  #
         #######################
-        
         raise NotImplementedError
-
         ########################
         # END OF YOUR CODE    #
         #######################
@@ -147,9 +139,7 @@ class CustomLayerNormManualFunction(torch.autograd.Function):
         ########################
         # PUT YOUR CODE HERE  #
         #######################
-
-        raise NotImplementedError
-        
+        raise NotImplementedError        
         ########################
         # END OF YOUR CODE    #
         #######################

@@ -137,7 +137,7 @@ def train(config):
         log_probs = model(batch_inputs)
 
         # Compute the loss, gradients and update network parameters
-        loss = loss_function(log_probs, batch_targets)
+        loss = loss_function(log_probs, batch_targets.long())
         loss.backward()
 
         #######################################################################

@@ -16,7 +16,7 @@ class MLP(nn.Module):
     Once initialized an MLP object can perform forward.
     """
     
-    def __init__(self, n_inputs, n_hidden, n_classes):
+    def __init__(self, n_inputs, n_hidden, n_classes, batchnorm=False):
         """
         Initializes MLP object.
         
@@ -29,18 +29,28 @@ class MLP(nn.Module):
           n_classes: number of classes of the classification problem.
                      This number is required in order to specify the
                      output dimensions of the MLP
+          batchnorm: boolean whether batchnormalization layer is added
+                      after ech ELU module
     
         TODO:
         Implement initialization of the network.
         """
+
+        super(MLP, self).__init__()
+        self.layers = []
         
-        ########################
-        # PUT YOUR CODE HERE  #
-        #######################
-        raise NotImplementedError
-        ########################
-        # END OF YOUR CODE    #
-        #######################
+        # check whether the network has hidden layers or not
+        if len(n_hidden) >= 1:
+          for n_outputs in n_hidden:
+            self.layers.append(nn.Linear(n_inputs,n_outputs))
+            self.layers.append(nn.ELU())
+            if batchnorm:
+              self.layers.append(nn.BatchNorm1d(n_outputs))
+            n_inputs = n_outputs
+
+        self.layers.append(nn.Linear(n_inputs,n_classes))
+
+        self.layers = nn.Sequential(*self.layers)
     
     def forward(self, x):
         """
@@ -55,13 +65,6 @@ class MLP(nn.Module):
         TODO:
         Implement forward pass of the network.
         """
-        
-        ########################
-        # PUT YOUR CODE HERE  #
-        #######################
-        raise NotImplementedError
-        ########################
-        # END OF YOUR CODE    #
-        #######################
+        out = self.layers(x)
         
         return out

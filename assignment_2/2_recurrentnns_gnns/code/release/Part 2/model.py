@@ -26,8 +26,34 @@ class TextGenerationModel(nn.Module):
                  lstm_num_hidden=256, lstm_num_layers=2, device='cuda:0'):
 
         super(TextGenerationModel, self).__init__()
-        # Initialization here...
+        
+        self.batch_size = batch_size
+        self.seq_length = 
+        self.vocabulary_size = vocabulary_size
+
+        self.model = nn.LSTM(batch_size, lstm_num_hidden, lstm_num_layers, batch_first=True)
+        self.emb = nn.Embedding(vocabulary_size, 128) # A NICE POWER OF 2 NUMBER
 
     def forward(self, x):
         # Implementation here...
-        pass
+        for t in range(self.seq_length-1):
+            x, hidden = self.model(self.emb(x[:,t]))
+
+        return x
+
+    def generate(self, start_sentence=None, genLen=30):
+        def backtranslate():
+            raise NotImplementedError
+
+        genSen = []
+        if not start_sentence:
+            start_sentence = torch.random((1))
+        
+        for t in range(genLen):
+            x = self.emb(start_sentence)
+            output = self.model(x)
+            if t >= (len(start_sentence)-1):
+                start_sentence.append(output)
+
+        return backtranslate(genSen)
+
